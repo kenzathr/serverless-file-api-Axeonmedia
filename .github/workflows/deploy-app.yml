@@ -1,0 +1,60 @@
+name: Deploiement Application
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+
+jobs:
+  deploy-backend:
+    name: Déployer Lambda (Backend)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Configuration AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+
+      - name: Zipper le code Python
+        run: |
+          cd app/backend
+          zip -r lambda.zip handler.py
+
+      - name: Déployer sur Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name kanza-file-api-presign \
+            --zip-file fileb://app/backend/lambda.zip
+
+  deploy-frontend:
+    name: Déployer Frontend (S3)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Configuration AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+
+      - name: Déployer HTML sur S3
+        run: |
+          aws s3 sync app/frontend/ s3://kanza-file-api-files-dev/frontend/ \
+            --delete
+
+      - name: Invalider le cache CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/frontend/*"
