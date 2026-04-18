@@ -3,549 +3,223 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Axeon Media — Secure File Distribution</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <title>Axeon Media — Téléchargement Sécurisé</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     :root {
-      --bg:        #0a0a0f;
-      --bg2:       #111118;
-      --bg3:       #1a1a24;
-      --border:    rgba(255,255,255,0.08);
-      --border2:   rgba(255,255,255,0.15);
-      --accent:    #6366f1;
-      --accent2:   #818cf8;
-      --green:     #10b981;
-      --red:       #ef4444;
-      --text:      #f1f5f9;
-      --muted:     #64748b;
-      --muted2:    #94a3b8;
+      --bg: #050508;
+      --card: #0c0c14;
+      --accent: #6366f1;
+      --border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
     }
 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
     }
 
-    /* Background grid */
+    /* Gradient de fond discret */
     body::before {
-      content: '';
+      content: "";
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Glow top */
-    body::after {
-      content: '';
-      position: fixed;
-      top: -200px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 400px;
-      background: radial-gradient(ellipse, rgba(99,102,241,0.12) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* NAV */
-    nav {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 40px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(10,10,15,0.8);
-      backdrop-filter: blur(12px);
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-    }
-
-    .nav-logo-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-    }
-
-    .nav-badge {
-      font-size: 11px;
-      font-family: 'DM Mono', monospace;
-      background: rgba(99,102,241,0.15);
-      color: var(--accent2);
-      border: 1px solid rgba(99,102,241,0.3);
-      padding: 3px 10px;
-      border-radius: 20px;
-      letter-spacing: 0.5px;
-    }
-
-    /* MAIN */
-    main {
-      flex: 1;
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 24px;
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, transparent 50%);
+      z-index: -1;
     }
 
     .container {
       width: 100%;
-      max-width: 520px;
-    }
-
-    /* Header */
-    .header {
+      max-width: 440px;
+      padding: 20px;
       text-align: center;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.5px;
       margin-bottom: 40px;
-      animation: fadeUp 0.6s ease both;
+      text-transform: uppercase;
     }
 
-    .header-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-family: 'DM Mono', monospace;
-      color: var(--accent2);
-      background: rgba(99,102,241,0.1);
-      border: 1px solid rgba(99,102,241,0.2);
-      padding: 5px 12px;
-      border-radius: 20px;
-      margin-bottom: 20px;
-      letter-spacing: 0.5px;
-    }
+    .logo span { color: var(--accent); }
 
-    .header-tag::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: var(--green);
-      border-radius: 50%;
-      box-shadow: 0 0 6px var(--green);
-      animation: pulse 2s ease infinite;
-    }
-
-    h1 {
-      font-size: 36px;
-      font-weight: 600;
-      letter-spacing: -1px;
-      line-height: 1.15;
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
       margin-bottom: 12px;
-      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      letter-spacing: -0.5px;
     }
 
-    .header-sub {
+    .header p {
+      color: var(--text-muted);
       font-size: 15px;
-      color: var(--muted2);
-      line-height: 1.6;
+      line-height: 1.5;
+      margin-bottom: 32px;
     }
 
-    /* Card */
+    /* Carte de téléchargement */
     .card {
-      background: var(--bg2);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 32px;
-      animation: fadeUp 0.6s ease 0.1s both;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent);
-    }
-
-    .field-label {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .field-label span {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted2);
-      letter-spacing: 0.2px;
-    }
-
-    .field-label code {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--accent2);
-      background: rgba(99,102,241,0.1);
-      padding: 2px 7px;
-      border-radius: 4px;
-    }
-
-    .input-wrap {
-      position: relative;
-      margin-bottom: 16px;
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 15px;
-      pointer-events: none;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
 
     input[type="text"] {
       width: 100%;
-      padding: 13px 14px 13px 40px;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
+      background: #000;
+      border: 1px solid var(--border);
       border-radius: 10px;
-      font-family: 'DM Mono', monospace;
-      font-size: 14px;
-      color: var(--text);
-      outline: none;
-      transition: border 0.2s, box-shadow 0.2s;
+      padding: 16px;
+      color: #fff;
+      font-size: 15px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: border 0.2s;
     }
-
-    input[type="text"]::placeholder { color: var(--muted); }
 
     input[type="text"]:focus {
+      outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
     }
 
-    /* Button */
     button {
       width: 100%;
-      padding: 13px;
       background: var(--accent);
       color: white;
       border: none;
+      padding: 16px;
       border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
       font-size: 15px;
-      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-      letter-spacing: -0.2px;
+      transition: transform 0.2s, background 0.2s;
     }
 
-    button::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(rgba(255,255,255,0.08), transparent);
-    }
-
-    button:hover:not(:disabled) {
-      background: #5558e8;
+    button:hover {
+      background: #4f46e5;
       transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(99,102,241,0.35);
     }
 
-    button:active:not(:disabled) { transform: translateY(0); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-inner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Spinner */
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
+    /* Résultat */
+    #downloadBox {
+      margin-top: 24px;
       display: none;
+      animation: fadeIn 0.4s ease;
     }
 
-    /* Messages */
-    .message {
-      margin-top: 16px;
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 14px;
-      display: none;
-      animation: fadeUp 0.3s ease both;
-    }
-
-    .success {
-      background: rgba(16,185,129,0.08);
-      border: 1px solid rgba(16,185,129,0.25);
-      color: #6ee7b7;
-    }
-
-    .error {
-      background: rgba(239,68,68,0.08);
-      border: 1px solid rgba(239,68,68,0.25);
-      color: #fca5a5;
-    }
-
-    .success-title {
-      font-weight: 600;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .download-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(16,185,129,0.15);
-      border: 1px solid rgba(16,185,129,0.3);
-      color: var(--green);
-      padding: 10px 14px;
-      border-radius: 8px;
+    .download-link {
+      display: block;
+      background: #fff;
+      color: #000;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 13px;
-      transition: all 0.2s;
-      margin-top: 8px;
-      width: fit-content;
+      padding: 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 12px;
     }
 
-    .download-btn:hover {
-      background: rgba(16,185,129,0.25);
-      transform: translateX(2px);
-    }
-
-    .expiry-note {
-      margin-top: 10px;
+    .notice {
       font-size: 12px;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      color: var(--text-muted);
     }
 
-    /* Security badges */
-    .badges {
-      display: flex;
-      gap: 8px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-      animation: fadeUp 0.6s ease 0.2s both;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      color: var(--muted);
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-family: 'DM Mono', monospace;
-    }
-
-    .badge-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--green);
-    }
-
-    /* Footer */
     footer {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 20px;
+      margin-top: 40px;
       font-size: 12px;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
-      font-family: 'DM Mono', monospace;
-    }
-
-    /* Animations */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.4; }
+      color: var(--text-muted);
+      opacity: 0.6;
     }
   </style>
 </head>
 <body>
 
-  <nav>
-    <div class="nav-logo">
-      <div class="nav-logo-icon">▲</div>
-      Axeon Media
+  <div class="container">
+    <div class="logo">Axeon <span>Media</span></div>
+
+    <div class="header">
+      <h1>Récupérer vos fichiers</h1>
+      <p>Saisissez votre référence client pour accéder à vos rendus 3D.</p>
     </div>
-    <span class="nav-badge">SECURE DISTRIBUTION</span>
-  </nav>
 
-  <main>
-    <div class="container">
+    <div class="card">
+      <input type="text" id="fileId" placeholder="Ex: PROJET-VILLA-2026" autocomplete="off">
+      
+      <button id="btn" onclick="demanderLien()">
+        Accéder au téléchargement
+      </button>
 
-      <div class="header">
-        <div class="header-tag">AWS Serverless · CloudFront · S3</div>
-        <h1>Secure File<br>Distribution</h1>
-        <p class="header-sub">Accédez à vos fichiers 3D via un lien sécurisé<br>et temporaire généré à la demande.</p>
+      <div id="downloadBox">
+        <a href="#" class="download-link" id="downloadLink" target="_blank">
+          Télécharger le fichier maintenant
+        </a>
+        <p class="notice">Ce lien est valable pendant 1 heure.</p>
       </div>
 
-      <div class="card">
-        <div class="field-label">
-          <span>Identifiant du fichier</span>
-          <code>FileID</code>
-        </div>
-
-        <div class="input-wrap">
-          <span class="input-icon">⊡</span>
-          <input
-            type="text"
-            id="fileId"
-            placeholder="rendus/projet-villa.zip"
-            autocomplete="off"
-            spellcheck="false"
-          >
-        </div>
-
-        <button id="btn" onclick="demanderLien()">
-          <div class="btn-inner">
-            <div class="spinner" id="spinner"></div>
-            <span id="btn-text">Générer le lien de téléchargement</span>
-          </div>
-        </button>
-
-        <div class="message success" id="success">
-          <div class="success-title">✓ Lien généré avec succès</div>
-          <a class="download-btn" id="downloadLink" href="#" target="_blank">
-            ↓ Télécharger le fichier
-          </a>
-          <div class="expiry-note">⏱ Expire dans 60 minutes</div>
-        </div>
-
-        <div class="message error" id="errorMsg"></div>
+      <div id="errorMsg" style="color: #f87171; font-size: 13px; margin-top: 16px; display: none;">
+        Référence introuvable. Veuillez vérifier votre code.
       </div>
-
-      <div class="badges">
-        <span class="badge"><span class="badge-dot"></span>Chiffré AES-256</span>
-        <span class="badge"><span class="badge-dot"></span>Lien temporaire</span>
-        <span class="badge"><span class="badge-dot"></span>Accès tracé</span>
-        <span class="badge"><span class="badge-dot"></span>CDN mondial</span>
-      </div>
-
     </div>
-  </main>
 
-  <footer>
-    Axeon Media · Distribution sécurisée · Powered by AWS Serverless
-  </footer>
+    <footer>
+      Transfert sécurisé par Axeon Media Cloud
+    </footer>
+  </div>
 
   <script>
-    // ⚠️ Remplacez par votre URL API Gateway
     const API_URL = "https://9wwf259n37.execute-api.eu-west-3.amazonaws.com/dev";
 
     async function demanderLien() {
-      const fileId   = document.getElementById("fileId").value.trim();
-      const btn      = document.getElementById("btn");
-      const btnText  = document.getElementById("btn-text");
-      const spinner  = document.getElementById("spinner");
-      const success  = document.getElementById("success");
+      const fileId = document.getElementById("fileId").value.trim();
+      const btn = document.getElementById("btn");
+      const downloadBox = document.getElementById("downloadBox");
       const errorMsg = document.getElementById("errorMsg");
 
-      success.style.display  = "none";
+      if (!fileId) return;
+
+      downloadBox.style.display = "none";
       errorMsg.style.display = "none";
-
-      if (!fileId) {
-        errorMsg.textContent   = "❌ Veuillez entrer un identifiant de fichier.";
-        errorMsg.style.display = "block";
-        return;
-      }
-
-      btn.disabled          = true;
-      spinner.style.display = "block";
-      btnText.textContent   = "Génération en cours...";
+      btn.disabled = true;
+      btn.textContent = "Vérification...";
 
       try {
         const response = await fetch(`${API_URL}/fichiers/${encodeURIComponent(fileId)}`);
-        const data     = await response.json();
+        const data = await response.json();
 
         if (response.ok && data.download_url) {
           document.getElementById("downloadLink").href = data.download_url;
-          success.style.display = "block";
+          downloadBox.style.display = "block";
+          btn.style.display = "none";
         } else {
-          errorMsg.textContent   = "❌ " + (data.error || data.erreur || "Fichier introuvable.");
           errorMsg.style.display = "block";
         }
       } catch (e) {
-        errorMsg.textContent   = "❌ Erreur de connexion à l'API.";
+        errorMsg.textContent = "Erreur de connexion. Veuillez réessayer.";
         errorMsg.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        if (btn.style.display !== "none") btn.textContent = "Accéder au téléchargement";
       }
-
-      btn.disabled          = false;
-      spinner.style.display = "none";
-      btnText.textContent   = "Générer le lien de téléchargement";
     }
-
-    // Permettre la touche Entrée
-    document.getElementById("fileId").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") demanderLien();
-    });
   </script>
-
 </body>
 </html>
