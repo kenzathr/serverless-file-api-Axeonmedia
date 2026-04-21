@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Récupérer le code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.0  # ✅ MISE À JOUR: v4 → v4.2.0 (Node.js 24 compatible)
 
       - name: Configuration AWS
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v4.1.0  # ✅ MISE À JOUR: v4 → v4.1.0 (Node.js 24 compatible)
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -31,7 +31,7 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name kanza-file-api-presign \
-            --zip-file fileb://app/backend/lambda.zip
+            --zip-file file://app/backend/lambda.zip
 
   deploy-frontend:
     name: Déployer Frontend (S3)
@@ -39,22 +39,15 @@ jobs:
 
     steps:
       - name: Récupérer le code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.0  # ✅ MISE À JOUR: v4 → v4.2.0 (Node.js 24 compatible)
 
       - name: Configuration AWS
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v4.1.0  # ✅ MISE À JOUR: v4 → v4.1.0 (Node.js 24 compatible)
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-3
 
-      - name: Déployer HTML sur S3
+      - name: Déployer Frontend sur S3
         run: |
-          aws s3 sync app/frontend/ s3://kanza-file-api-files-dev/frontend/ \
-            --delete
-
-      - name: Invalider le cache CloudFront
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/frontend/*"
+          aws s3 cp app/frontend/ s3://kanza-file-api-frontend/ --recursive --region eu-west-3
