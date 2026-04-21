@@ -48,16 +48,16 @@ module "api_gateway" {
   lambda_function_name = module.lambda.function_name
 }
 
-# --- Ligne 51 ---
 module "cloudfront" {
   source = "./modules/cloudfront"
 
   project_name                = var.project_name
   environment                 = var.environment
-  bucket_id                   = var.bucket_id
-  bucket_arn                  = var.bucket_arn
-  bucket_regional_domain_name = var.bucket_regional_domain_name
-
-  # AJOUTE CETTE LIGNE ICI : C'est elle qui manquait !
+  
+  # On récupère les sorties du module S3 (pas des variables)
+  bucket_id                   = module.s3.bucket_id
+  bucket_arn                  = module.s3.bucket_arn
+  bucket_regional_domain_name = module.s3.bucket_regional_domain_name
+  
   public_key_pem              = var.public_key_pem
 }
