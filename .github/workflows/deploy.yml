@@ -34,20 +34,15 @@ jobs:
         run: terraform init
         working-directory: ./infra
 
-      # J'ai mis cette étape en commentaire pour éviter que le pipeline bloque sur l'esthétique
-      # - name: Terraform Format
-      #   run: terraform fmt -check
-      #   working-directory: ./infra
-
       - name: Terraform Validate
         run: terraform validate
         working-directory: ./infra
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}"
         working-directory: ./infra
 
       - name: Terraform Apply (branche main uniquement)
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}"
         working-directory: ./infra
