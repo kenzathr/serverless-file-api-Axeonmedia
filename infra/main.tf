@@ -54,7 +54,7 @@ module "cloudfront" {
   project_name                = var.project_name
   environment                 = var.environment
   
-  # On récupère les sorties du module S3 (pas des variables)
+  # Utilise les outputs du module S3
   bucket_id                   = module.s3.bucket_id
   bucket_arn                  = module.s3.bucket_arn
   bucket_regional_domain_name = module.s3.bucket_regional_domain_name
