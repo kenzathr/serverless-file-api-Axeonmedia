@@ -1,27 +1,22 @@
-# Création de la ressource Clé Publique dans AWS
-resource "aws_cloudfront_public_key" "pfe_key" {
-  name        = "${var.project_name}-public-key"
-  comment     = "Cle pour la signature des URLs - Projet Axeon Media"
-  encoded_key = var.public_key_pem
-}
-
-# Création du groupe de clés
-resource "aws_cloudfront_key_group" "pfe_key_group" {
-  name    = "${var.project_name}-key-group"
-  comment = "Groupe de cles pour securiser les rendus 3D"
-  items   = [aws_cloudfront_public_key.pfe_key.id]
-}
-
-# Distribution CloudFront sécurisée
 resource "aws_cloudfront_distribution" "cdn" {
   enabled = true
-  # ... (ton code pour origin et OAC)
+
+  origin {
+    domain_name = var.bucket_regional_domain_name
+    origin_id   = "S3Origin"
+    s3_origin_config {
+      origin_access_identity = "" 
+    }
+  }
 
   default_cache_behavior {
-    target_origin_id       = "OrigineS3"
+    target_origin_id       = "S3Origin"
     viewer_protocol_policy = "redirect-to-https"
     
-    # Activation de la restriction par signature
+    # INDISPENSABLE pour la validation
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    
     trusted_key_groups = [aws_cloudfront_key_group.pfe_key_group.id]
 
     forwarded_values {
@@ -30,16 +25,5 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
   
-  # ... (restrictions et certificat)
-# ... tes autres configurations ...
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
-  viewer_certificate {
-    cloudfront_default_certificate = true
-  }
+  # ... (conserve tes blocs restrictions et viewer_certificate)
 }
