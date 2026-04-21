@@ -28,16 +28,21 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ./infra
 
       - name: Terraform Format
         run: terraform fmt -check
+        working-directory: ./infra
 
       - name: Terraform Validate
         run: terraform validate
+        working-directory: ./infra
 
       - name: Terraform Plan
         run: terraform plan
+        working-directory: ./infra
 
       - name: Terraform Apply (branche main uniquement)
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
+        working-directory: ./infra
