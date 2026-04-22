@@ -38,10 +38,9 @@ jobs:
         run: terraform validate
         working-directory: ./infra
 
-      # ÉTAPE CLÉ : On importe le S3 que tu as gardé pour ne pas avoir d'erreur
-      # On ajoute "|| true" pour que ça passe même si c'est déjà fait
+      # ÉTAPE CORRIGÉE : On passe la variable pour que l'import ne bloque pas
       - name: Terraform Import S3
-        run: terraform import module.s3.aws_s3_bucket.files kanza-file-api-files-dev || true
+        run: terraform import -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}" module.s3.aws_s3_bucket.files kanza-file-api-files-dev || true
         working-directory: ./infra
 
       - name: Terraform Plan
