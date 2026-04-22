@@ -66,8 +66,3 @@ module "cloudfront" {
   public_key_pem              = var.public_key_pem
   origin_access_control_id    = aws_cloudfront_origin_access_control.default.id
 }
-
-
-en direct
-
-Passer en direct
