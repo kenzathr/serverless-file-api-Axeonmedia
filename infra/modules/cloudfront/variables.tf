@@ -1,35 +1,22 @@
-variable "project_name" {
-  description = "Nom du projet pour le tagging des ressources Axeon Media"
+variable "aws_region" {
+  description = "Region AWS de deploiement"
   type        = string
+  default     = "eu-west-3"
+}
+
+variable "project_name" {
+  description = "Prefixe utilise pour nommer toutes les ressources"
+  type        = string
+  default     = "kanza-file-api"
 }
 
 variable "environment" {
-  description = "Environnement de déploiement (dev/prod)"
+  description = "Environnement de deploiement"
   type        = string
+  default     = "dev"
 }
 
-variable "bucket_id" {
-  description = "ID du bucket S3 contenant les rendus 3D"
-  type        = string
-}
-
-variable "bucket_arn" {
-  description = "ARN du bucket pour la configuration des politiques IAM"
-  type        = string
-}
-
-variable "bucket_regional_domain_name" {
-  description = "Domaine regional du bucket S3 utilise par CloudFront"
-  type        = string
-}
-
-# --- AJOUT POUR LA SÉCURITÉ CLOUDFRONT ---
 variable "public_key_pem" {
   description = "Contenu de la cle publique pour CloudFront"
-  type        = string
-}
-
-variable "origin_access_control_id" {
-  description = "ID du contrôle d'accès à l'origine CloudFront (OAC)"
   type        = string
 }
