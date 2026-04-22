@@ -6,14 +6,12 @@ on:
   pull_request:
     branches: [main]
 
-# Active Node.js 24 pour éviter les warnings de dépréciation
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
-
     steps:
       - name: Récupérer le code
         uses: actions/checkout@v4
@@ -38,16 +36,33 @@ jobs:
         run: terraform validate
         working-directory: ./infra
 
-      # ÉTAPE CORRIGÉE : On passe la variable pour que l'import ne bloque pas
-      - name: Terraform Import S3
-        run: terraform import -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}" module.s3.aws_s3_bucket.files kanza-file-api-files-dev || true
+      - name: Import des ressources existantes
         working-directory: ./infra
+        run: |
+          terraform import -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}" \
+            module.s3.aws_s3_bucket.files kanza-file-api-files-dev || true
+
+          terraform import -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}" \
+            module.api_gateway.aws_cloudwatch_log_group.apigw \
+            /aws/api-gateway/kanza-file-api || true
+
+          terraform import -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}" \
+            module.iam.aws_iam_policy.lambda_s3 \
+            arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:policy/kanza-file-api-lambda-s3-policy || true
+
+          terraform import -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}" \
+            module.iam.aws_iam_policy.lambda_dynamodb \
+            arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:policy/kanza-file-api-lambda-dynamo-policy || true
+
+          terraform import -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}" \
+            module.lambda.aws_lambda_function.presign \
+            kanza-file-api-presign || true
 
       - name: Terraform Plan
         run: terraform plan -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}"
         working-directory: ./infra
 
-      - name: Terraform Apply (branche main uniquement)
+      - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}"
         working-directory: ./infra
