@@ -15,11 +15,11 @@ resource "aws_lambda_function" "presign" {
   timeout          = 10
   memory_size      = 128
 
-  environment {
+ environment {
     variables = {
-      BUCKET_NAME          = var.bucket_id
-      DYNAMODB_TABLE       = var.dynamodb_table_name
-      URL_EXPIRY_SECONDS   = "3600"
+      BUCKET_NAME        = var.bucket_id
+      DYNAMODB_TABLE     = var.dynamodb_table_name
+      URL_EXPIRY         = "3600" # On enlève _SECONDS pour matcher le code Python
     }
   }
 
