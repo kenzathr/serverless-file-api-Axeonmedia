@@ -28,3 +28,8 @@ variable "public_key_pem" {
   description = "Contenu de la cle publique pour CloudFront"
   type        = string
 }
+
+variable "origin_access_control_id" {
+  description = "ID du contrôle d'accès à l'origine CloudFront (OAC)"
+  type        = string
+}
