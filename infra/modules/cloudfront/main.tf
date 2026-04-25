@@ -1,19 +1,11 @@
-resource "aws_cloudfront_key_group" "pfe_key_group" {
-  name = "axeon-key-group"
-  items = [aws_cloudfront_public_key.pfe_key.id]
-}
-
-resource "aws_cloudfront_public_key" "pfe_key" {
-  name = "${var.project_name}-public-key"
-  encoded_key = var.public_key_pem
-}
-
 resource "aws_cloudfront_distribution" "cdn" {
   enabled = true
+  # Commentaire : index_document pour que CloudFront sache quoi charger à la racine
+  default_root_object = "index.html"
 
   origin {
-    domain_name = var.bucket_regional_domain_name
-    origin_id   = "S3Origin"
+    domain_name              = var.bucket_regional_domain_name
+    origin_id                = "S3Origin"
     origin_access_control_id = var.origin_access_control_id
   }
 
@@ -23,9 +15,8 @@ resource "aws_cloudfront_distribution" "cdn" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD"]
 
-    # --- ACTION : COMMENTE CETTE LIGNE ---
-    # trusted_key_groups = [aws_cloudfront_key_group.pfe_key_group.id]
-    # -------------------------------------
+    # La restriction d'accès a été supprimée ici pour permettre l'affichage du Hub.
+    # La sécurité des fichiers est gérée par l'API via les URLs présignées S3.
 
     forwarded_values {
       query_string = true
@@ -34,6 +25,7 @@ resource "aws_cloudfront_distribution" "cdn" {
       }
     }
   }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
