@@ -72,3 +72,31 @@ module "cloudfront" {
   public_key_pem              = var.public_key_pem
   origin_access_control_id    = aws_cloudfront_origin_access_control.default.id
 }
+# 1. Le réservoir d'utilisateurs
+resource "aws_cognito_user_pool" "axeon_user_pool" {
+  name = "axeon-media-users"
+
+  # On se connecte avec l'email
+  username_attributes = ["email"]
+  auto_verified_attributes = ["email"]
+
+  password_policy {
+    minimum_length = 8
+    require_lowercase = true
+    require_numbers   = true
+    require_symbols   = true
+    require_uppercase = true
+  }
+}
+
+# 2. Le "Client" pour ton interface Web
+resource "aws_cognito_user_pool_client" "axeon_client" {
+  name         = "axeon-web-client"
+  user_pool_id = aws_cognito_user_pool.axeon_user_pool.id
+
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+}
