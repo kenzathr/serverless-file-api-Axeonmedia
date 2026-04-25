@@ -8,7 +8,7 @@ resource "aws_cloudfront_public_key" "pfe_key" {
   encoded_key = var.public_key_pem
 }
 
-rresource "aws_cloudfront_distribution" "cdn" {
+resource "aws_cloudfront_distribution" "cdn" {
   enabled = true
 
   origin {
