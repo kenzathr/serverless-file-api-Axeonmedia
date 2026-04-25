@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Axeon Media — Téléchargement Sécurisé</title>
+  <title>Axeon Media — Axeon Media Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -154,7 +154,7 @@
 <body>
 
   <div class="container">
-    <div class="logo">Axeon <span>Media</span></div>
+    <div class="logo">Axeon <span>Media Hub</span></div>
 
     <div class="header">
       <h1>Récupérer vos fichiers</h1>
@@ -162,7 +162,7 @@
     </div>
 
     <div class="card">
-      <input type="text" id="fileId" placeholder="Ex: PROJET-VILLA-2026" autocomplete="off">
+      <input type="text" id="fileId" placeholder="Ex: test.txt" autocomplete="off">
       
       <button id="btn" onclick="demanderLien()">
         Accéder au téléchargement
@@ -172,7 +172,7 @@
         <a href="#" class="download-link" id="downloadLink">
           Télécharger le fichier maintenant
         </a>
-        <p class="notice">Ce lien est valable pendant 1 heure.</p>
+        <p class="notice">Ce lien sécurisé est valable 1 heure.</p>
       </div>
 
       <div id="errorMsg" style="color: #f87171; font-size: 13px; margin-top: 16px; display: none;">
@@ -181,12 +181,13 @@
     </div>
 
     <footer>
-      Transfert sécurisé par Axeon Media Cloud
+      Architecture Cloud sécurisée par Axeon Media
     </footer>
   </div>
 
   <script>
-    const API_URL = "https://9wwf259n37.execute-api.eu-west-3.amazonaws.com/dev";
+    // Utilisation de l'ID d'API validé 8t05lg7z0l
+    const API_URL = "https://8t05lg7z0l.execute-api.eu-west-3.amazonaws.com/dev";
 
     async function demanderLien() {
       const fileId = document.getElementById("fileId").value.trim();
@@ -200,7 +201,7 @@
       downloadBox.style.display = "none";
       errorMsg.style.display = "none";
       btn.disabled = true;
-      btn.textContent = "Vérification...";
+      btn.textContent = "Vérification en cours...";
 
       try {
         const response = await fetch(`${API_URL}/fichiers/${encodeURIComponent(fileId)}`);
@@ -209,7 +210,7 @@
         if (response.ok && data.download_url) {
           downloadLink.href = data.download_url;
           
-          // Force le téléchargement avec le nom du fichier
+          // Nom de fichier propre pour le téléchargement
           const fileName = fileId.split('/').pop(); 
           downloadLink.setAttribute("download", fileName);
           
@@ -219,7 +220,7 @@
           errorMsg.style.display = "block";
         }
       } catch (e) {
-        errorMsg.textContent = "Erreur de connexion. Veuillez réessayer.";
+        errorMsg.textContent = "Erreur de connexion à l'API.";
         errorMsg.style.display = "block";
       } finally {
         btn.disabled = false;
