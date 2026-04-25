@@ -38,13 +38,21 @@ def file_exists_in_s3(file_id: str) -> bool:
     except Exception:
         return False
 
-
 def generate_presigned_url(file_id: str) -> str:
-    """Génère une URL présignée S3 valable URL_EXPIRY secondes."""
+    """Génère une URL présignée S3 forçant le téléchargement et valable 1h."""
+    
+    # On extrait le nom du fichier pour qu'il garde son nom d'origine au téléchargement
+    filename = file_id.split('/')[-1]
+    
     return s3_client.generate_presigned_url(
         ClientMethod="get_object",
-        Params={"Bucket": BUCKET_NAME, "Key": file_id},
-        ExpiresIn=URL_EXPIRY
+        Params={
+            "Bucket": BUCKET_NAME, 
+            "Key": file_id,
+            # CETTE LIGNE FORCE LE TÉLÉCHARGEMENT SUR LE PC :
+            "ResponseContentDisposition": f"attachment; filename=\"{filename}\""
+        },
+        ExpiresIn=URL_EXPIRY # Utilise bien tes 3600 secondes (1h)
     )
 
 
