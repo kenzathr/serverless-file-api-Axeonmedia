@@ -18,7 +18,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_cloudfront_origin_access_control" "default" {
+resource "aws_cloudfront_origin_access_control" "default" { 
   name                              = "OAC for ${var.project_name}"
   description                       = "Origin Access Control for S3 bucket"
   origin_access_control_origin_type = "s3"
