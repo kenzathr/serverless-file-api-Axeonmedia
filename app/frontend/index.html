@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Axeon Media — Axeon Media Hub</title>
+  <title>Axeon Media — Téléchargement Sécurisé</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -92,17 +92,22 @@
       border-color: var(--accent);
     }
 
-    button {
+    button, .download-link {
       width: 100%;
-      background: var(--accent);
-      color: white;
-      border: none;
+      display: block;
       padding: 16px;
       border-radius: 10px;
       font-weight: 600;
       font-size: 15px;
       cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
     }
 
     button:hover {
@@ -110,29 +115,27 @@
       transform: translateY(-1px);
     }
 
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    #downloadBox {
-      margin-top: 24px;
-      display: none;
-      animation: fadeIn 0.4s ease;
-    }
-
     .download-link {
-      display: block;
       background: #fff;
       color: #000;
-      text-decoration: none;
-      padding: 16px;
-      border-radius: 10px;
       font-weight: 700;
-      font-size: 15px;
-      margin-bottom: 12px;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .download-link:hover {
+      background: #f1f5f9;
+      transform: scale(1.02);
+    }
+
+    #downloadBox {
+      margin-top: 10px;
+      display: none;
     }
 
     .notice {
       font-size: 12px;
       color: var(--text-muted);
+      margin-top: 15px;
     }
 
     @keyframes fadeIn {
@@ -151,73 +154,76 @@
 <body>
 
   <div class="container">
-    <div class="logo">Axeon <span>Media Hub</span></div>
+    <div class="logo">Axeon <span>Media</span></div>
 
     <div class="header">
-      <h1>Vos rendus 3D</h1>
-      <p>Entrez votre référence projet pour générer un lien de téléchargement sécurisé.</p>
+      <h1>Récupérer vos fichiers</h1>
+      <p>Saisissez votre référence client pour accéder à vos rendus 3D.</p>
     </div>
 
     <div class="card">
-      <input type="text" id="fileId" placeholder="Ex: test.txt" autocomplete="off">
+      <input type="text" id="fileId" placeholder="Ex: PROJET-VILLA-2026" autocomplete="off">
       
       <button id="btn" onclick="demanderLien()">
-        Accéder au projet
+        Accéder au téléchargement
       </button>
 
       <div id="downloadBox">
-        <a href="#" class="download-link" id="downloadLink" target="_blank">
-          Télécharger le fichier
+        <a href="#" class="download-link" id="downloadLink">
+          Télécharger le fichier maintenant
         </a>
-        <p class="notice">Lien sécurisé (valable 60 min).</p>
+        <p class="notice">Ce lien est valable pendant 1 heure.</p>
       </div>
 
       <div id="errorMsg" style="color: #f87171; font-size: 13px; margin-top: 16px; display: none;">
-        Référence introuvable.
+        Référence introuvable. Veuillez vérifier votre code.
       </div>
     </div>
 
     <footer>
-      Powered by Axeon Cloud Architecture
+      Transfert sécurisé par Axeon Media Cloud
     </footer>
   </div>
 
   <script>
-    // ID API validé suite au test réussi (Statut 200)
-    const API_URL = "https://8t05lg7z0l.execute-api.eu-west-3.amazonaws.com/dev";
+    const API_URL = "https://9wwf259n37.execute-api.eu-west-3.amazonaws.com/dev";
 
     async function demanderLien() {
       const fileId = document.getElementById("fileId").value.trim();
       const btn = document.getElementById("btn");
       const downloadBox = document.getElementById("downloadBox");
       const errorMsg = document.getElementById("errorMsg");
+      const downloadLink = document.getElementById("downloadLink");
 
       if (!fileId) return;
 
       downloadBox.style.display = "none";
       errorMsg.style.display = "none";
       btn.disabled = true;
-      btn.textContent = "Génération du lien...";
+      btn.textContent = "Vérification...";
 
       try {
-        // Appel à l'API Gateway via la méthode GET
         const response = await fetch(`${API_URL}/fichiers/${encodeURIComponent(fileId)}`);
         const data = await response.json();
 
         if (response.ok && data.download_url) {
-          document.getElementById("downloadLink").href = data.download_url;
+          downloadLink.href = data.download_url;
+          
+          // Force le téléchargement avec le nom du fichier
+          const fileName = fileId.split('/').pop(); 
+          downloadLink.setAttribute("download", fileName);
+          
           downloadBox.style.display = "block";
           btn.style.display = "none";
         } else {
           errorMsg.style.display = "block";
-          errorMsg.textContent = "Fichier introuvable sur le serveur.";
         }
       } catch (e) {
-        errorMsg.textContent = "Erreur de connexion à l'infrastructure.";
+        errorMsg.textContent = "Erreur de connexion. Veuillez réessayer.";
         errorMsg.style.display = "block";
       } finally {
         btn.disabled = false;
-        if (btn.style.display !== "none") btn.textContent = "Accéder au projet";
+        if (btn.style.display !== "none") btn.textContent = "Accéder au téléchargement";
       }
     }
   </script>
