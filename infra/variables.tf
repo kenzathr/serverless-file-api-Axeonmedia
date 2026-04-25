@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Prefixe utilise pour nommer toutes les ressources"
   type        = string
-  default     = "kanza-file-api"
+  default     = "kanza-file-api-v2"
 }
 
 variable "environment" {
