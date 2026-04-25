@@ -28,6 +28,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-3
 
+      # ÉTAPE AJOUTÉE : Préparation du binaire Lambda
+      - name: Zipper le code de la Lambda
+        run: |
+          cd app/backend
+          zip -r lambda.zip . 
+        # Assure-toi que le chemin app/backend correspond bien à ton dossier de code
+
       - name: Terraform Init
         run: terraform init
         working-directory: ./infra
@@ -44,3 +51,11 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve -var="public_key_pem=${{ secrets.PUBLIC_KEY_PEM }}"
         working-directory: ./infra
+
+      # ÉTAPE AJOUTÉE : Mise à jour du code (Correction du bug fileb://)
+      - name: Mise à jour du code Lambda
+        if: github.ref == 'refs/heads/main'
+        run: |
+          aws lambda update-function-code \
+            --function-name kanza-file-api-presign \
+            --zip-file fileb://app/backend/lambda.zip
