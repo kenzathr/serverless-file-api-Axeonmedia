@@ -1,6 +1,7 @@
 output "url_api" {
   description = "URL de l'API Gateway"
-  value       = "${module.api_gateway.invoke_url}/fichiers/{file_key}"
+  # On remplace 'fichiers' par 'files' et 'file_key' par 'fileId' pour correspondre à ton test réussi
+  value       = "${module.api_gateway.invoke_url}/files/{fileId}"
 }
 
 output "domaine_cloudfront" {
