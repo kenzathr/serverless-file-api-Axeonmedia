@@ -8,7 +8,7 @@ resource "aws_cloudfront_public_key" "pfe_key" {
   encoded_key = var.public_key_pem
 }
 
-resource "aws_cloudfront_distribution" "cdn" {
+rresource "aws_cloudfront_distribution" "cdn" {
   enabled = true
 
   origin {
@@ -23,18 +23,17 @@ resource "aws_cloudfront_distribution" "cdn" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD"]
 
-    # Utilisation du groupe de clés existant
-    trusted_key_groups = [aws_cloudfront_key_group.pfe_key_group.id]
+    # --- ACTION : COMMENTE CETTE LIGNE ---
+    # trusted_key_groups = [aws_cloudfront_key_group.pfe_key_group.id]
+    # -------------------------------------
 
     forwarded_values {
       query_string = true
-
       cookies {
         forward = "none"
       }
     }
   }
-
   restrictions {
     geo_restriction {
       restriction_type = "none"
