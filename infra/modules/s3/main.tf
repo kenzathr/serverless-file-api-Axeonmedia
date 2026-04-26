@@ -43,3 +43,15 @@ resource "aws_s3_bucket_cors_configuration" "files" {
     max_age_seconds = 3600
   }
 }
+# Activation du chiffrement KMS pour le bucket S3
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encryption" {
+  bucket = aws_s3_bucket.this.id # "this" ou le nom de ta ressource bucket dans le module
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = "aws/s3" # Utilise la clé gérée par AWS (économique et efficace)
+    }
+    bucket_key_enabled = true # Réduit les coûts et améliore les performances
+  }
+}
