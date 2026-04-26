@@ -25,13 +25,13 @@ resource "aws_s3_bucket_versioning" "files" {
 
 # CONFIGURATION DU CHIFFREMENT 
 resource "aws_s3_bucket_server_side_encryption_configuration" "files_encryption" {
-  # On utilise bien .files.id ici pour correspondre à la ressource en haut
   bucket = aws_s3_bucket.files.id 
 
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
-      kms_master_key_id = "aws/s3" 
+      # En ne mettant PAS de kms_master_key_id, AWS utilise automatiquement 
+      # la clé par défaut 'aws/s3'. C'est la méthode la plus stable avec Terraform.
     }
     bucket_key_enabled = true 
   }
