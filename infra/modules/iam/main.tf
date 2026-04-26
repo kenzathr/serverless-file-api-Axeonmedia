@@ -54,3 +54,25 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamo_attach" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_dynamodb.arn
 }
+# Permission KMS : Déchiffrer les fichiers pour la signature
+resource "aws_iam_policy" "lambda_kms" {
+  name = "${var.project_name}-lambda-kms-policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ]
+      # Resource = "*" est acceptable ici pour utiliser la clé par défaut aws/s3
+      Resource = "*" 
+    }]
+  })
+}
+
+# Attachement de la politique KMS au rôle Lambda
+resource "aws_iam_role_policy_attachment" "lambda_kms_attach" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.lambda_kms.arn
+}
