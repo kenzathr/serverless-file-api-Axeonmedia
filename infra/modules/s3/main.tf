@@ -23,35 +23,27 @@ resource "aws_s3_bucket_versioning" "files" {
   }
 }
 
-# Chiffrement AES-256
-resource "aws_s3_bucket_server_side_encryption_configuration" "files" {
-  bucket = aws_s3_bucket.files.id
+# CONFIGURATION DU CHIFFREMENT 
+resource "aws_s3_bucket_server_side_encryption_configuration" "files_encryption" {
+  # On utilise bien .files.id ici pour correspondre à la ressource en haut
+  bucket = aws_s3_bucket.files.id 
+
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = "aws/s3" 
     }
+    bucket_key_enabled = true 
   }
 }
 
-# Configuration CORS pour les téléchargements depuis navigateur
+# Configuration CORS pour les téléchargements
 resource "aws_s3_bucket_cors_configuration" "files" {
   bucket = aws_s3_bucket.files.id
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET"]
-    allowed_origins = ["*"]
+    allowed_origins = ["*"] # En prod, on mettrait l'URL de CloudFront ici
     max_age_seconds = 3600
-  }
-}
-# Activation du chiffrement KMS pour le bucket S3
-resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encryption" {
-  bucket = aws_s3_bucket.this.id # "this" ou le nom de ta ressource bucket dans le module
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm     = "aws:kms"
-      kms_master_key_id = "aws/s3" # Utilise la clé gérée par AWS (économique et efficace)
-    }
-    bucket_key_enabled = true # Réduit les coûts et améliore les performances
   }
 }
