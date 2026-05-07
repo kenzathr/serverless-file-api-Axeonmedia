@@ -60,6 +60,7 @@ module "api_gateway" {
   environment          = var.environment
   lambda_invoke_arn    = module.lambda.invoke_arn
   lambda_function_name = module.lambda.function_name
+cognito_user_pool_arn = aws_cognito_user_pool.axeon_user_pool.arn
 }
 
 module "cloudfront" {
