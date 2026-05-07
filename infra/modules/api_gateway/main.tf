@@ -1,7 +1,16 @@
+# ============================================================
+# API GATEWAY — serverless-file-api-Axeonmedia
+# ============================================================
+
+# REST API
 resource "aws_api_gateway_rest_api" "api" {
   name        = "${var.project_name}-api"
   description = "API serverless de distribution de fichiers"
 }
+
+# ============================================================
+# RESSOURCES
+# ============================================================
 
 # Ressource /fichiers
 resource "aws_api_gateway_resource" "fichiers" {
@@ -17,15 +26,34 @@ resource "aws_api_gateway_resource" "file_key" {
   path_part   = "{file_key}"
 }
 
-# Méthode GET
+# ============================================================
+# COGNITO AUTHORIZER
+# ============================================================
+
+resource "aws_api_gateway_authorizer" "cognito" {
+  name                   = "cognito-authorizer"
+  rest_api_id            = aws_api_gateway_rest_api.api.id
+  type                   = "COGNITO_USER_POOLS"
+  provider_arns          = [aws_cognito_user_pool.axeon_user_pool.arn]
+  identity_source        = "method.request.header.Authorization"
+}
+
+# ============================================================
+# MÉTHODE GET /fichiers/{file_key}
+# ============================================================
+
 resource "aws_api_gateway_method" "get_fichier" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_resource.file_key.id
   http_method   = "GET"
-  authorization = "NONE"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito.id
 }
 
-# Intégration Lambda
+# ============================================================
+# INTÉGRATION LAMBDA
+# ============================================================
+
 resource "aws_api_gateway_integration" "lambda" {
   rest_api_id             = aws_api_gateway_rest_api.api.id
   resource_id             = aws_api_gateway_resource.file_key.id
@@ -35,7 +63,10 @@ resource "aws_api_gateway_integration" "lambda" {
   uri                     = var.lambda_invoke_arn
 }
 
-# Permission API Gateway → Lambda
+# ============================================================
+# PERMISSION API GATEWAY → LAMBDA
+# ============================================================
+
 resource "aws_lambda_permission" "apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
@@ -44,12 +75,23 @@ resource "aws_lambda_permission" "apigw" {
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
 
-# Déploiement
+# ============================================================
+# DÉPLOIEMENT
+# ============================================================
+
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
-  depends_on  = [aws_api_gateway_integration.lambda]
+
+  depends_on = [
+    aws_api_gateway_integration.lambda,
+    aws_api_gateway_authorizer.cognito
+  ]
+
   triggers = {
-    redeploiement = sha1(jsonencode(aws_api_gateway_rest_api.api.body))
+    redeploiement = sha1(jsonencode([
+      aws_api_gateway_rest_api.api.body,
+      aws_api_gateway_authorizer.cognito.id
+    ]))
   }
 }
 
@@ -59,8 +101,10 @@ resource "aws_api_gateway_stage" "prod" {
   stage_name    = var.environment
 }
 
+# ============================================================
+# LOGS CLOUDWATCH
+# ============================================================
 
-# Log group CloudWatch pour API Gateway
 resource "aws_cloudwatch_log_group" "apigw" {
   name              = "/aws/api-gateway/${var.project_name}"
   retention_in_days = 30
