@@ -18,7 +18,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_cloudfront_origin_access_control" "default" { 
+resource "aws_cloudfront_origin_access_control" "default" {
   name                              = "OAC for ${var.project_name}"
   description                       = "Origin Access Control for S3 bucket"
   origin_access_control_origin_type = "s3"
@@ -55,12 +55,12 @@ module "lambda" {
 }
 
 module "api_gateway" {
-  source               = "./modules/api_gateway"
-  project_name         = var.project_name
-  environment          = var.environment
-  lambda_invoke_arn    = module.lambda.invoke_arn
-  lambda_function_name = module.lambda.function_name
-cognito_user_pool_arn = aws_cognito_user_pool.axeon_user_pool.arn
+  source                = "./modules/api_gateway"
+  project_name          = var.project_name
+  environment           = var.environment
+  lambda_invoke_arn     = module.lambda.invoke_arn
+  lambda_function_name  = module.lambda.function_name
+  cognito_user_pool_arn = aws_cognito_user_pool.axeon_user_pool.arn
 }
 
 module "cloudfront" {
@@ -73,16 +73,20 @@ module "cloudfront" {
   public_key_pem              = var.public_key_pem
   origin_access_control_id    = aws_cloudfront_origin_access_control.default.id
 }
+
+# ============================================================
+# COGNITO USER POOL & CLIENT
+# ============================================================
+
 # 1. Le réservoir d'utilisateurs
 resource "aws_cognito_user_pool" "axeon_user_pool" {
   name = "axeon-media-users"
 
-  # On se connecte avec l'email
-  username_attributes = ["email"]
+  username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
 
   password_policy {
-    minimum_length = 8
+    minimum_length    = 8
     require_lowercase = true
     require_numbers   = true
     require_symbols   = true
@@ -90,7 +94,7 @@ resource "aws_cognito_user_pool" "axeon_user_pool" {
   }
 }
 
-# 2. Le "Client" pour ton interface Web
+# 2. Le "Client" pour l'interface Web
 resource "aws_cognito_user_pool_client" "axeon_client" {
   name         = "axeon-web-client"
   user_pool_id = aws_cognito_user_pool.axeon_user_pool.id
