@@ -51,3 +51,8 @@ jobs:
       - name: Déployer Frontend sur S3
         run: |
           aws s3 cp app/frontend/ s3://kanza-file-api-frontend/ --recursive --region eu-west-3
+          - name: Invalider le cache CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id E39270D5WFZ16B \
+            --paths "/*"
