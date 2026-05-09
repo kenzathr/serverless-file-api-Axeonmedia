@@ -11,8 +11,12 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # Clients AWS
-s3_client = boto3.client("s3")
-dynamodb  = boto3.resource("dynamodb")
+
+s3_config = Config(
+    signature_version='s3v4',
+    region_name='eu-west-3'
+)
+s3_client = boto3.client("s3", config=s3_config)
 
 # Variables d'environnement définies dans Terraform
 BUCKET_NAME = os.environ["BUCKET_NAME"]
